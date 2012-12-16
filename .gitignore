@@ -3,3 +3,4 @@ RandomWalk
 *.pyc
 .project
 .pydevproject
+ScidbLoader
