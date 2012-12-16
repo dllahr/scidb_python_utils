@@ -15,19 +15,16 @@ class TestScidbReader(unittest.TestCase):
     array_name = "test_scidb_read"
                 
     def setUp(self):
-        print "setup test array in database"
         unittest.TestCase.setUp(self)
         
         commands.getoutput("./setup.sh {}".format(self.array_name))
         
         
     def tearDown(self):
-        print "tearDown"
         commands.getoutput("iquery -naq \"remove({})\"".format(TestScidbReader.array_name))
         
         
     def test_read(self):
-        print "run test reading array"
         scidb = scidbapi.connect("localhost", 1239)
         
         reader = scidb_read.scidb_reader.ScidbReader(scidb)

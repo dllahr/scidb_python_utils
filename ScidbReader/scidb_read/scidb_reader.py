@@ -45,6 +45,8 @@ class ScidbReader:
         return self
     
     def next(self):
+        """return the next row of data if it is available otherwise raise StopIteration"""
+        
         first_chunk_iter = self.__attr_chunk_iter_tuple_list[0][1]
         
         #if the chunk is finished, try to increment to the next chunk
@@ -74,6 +76,7 @@ class ScidbReader:
 
 
     def __update_attr_chunk_iter(self):
+        """return True if the end has been reached otherwise return False"""
         self.__attr_chunk_iter_tuple_list = []
         
         end = self.__attr_iter_tuple_list[0][1].end()
