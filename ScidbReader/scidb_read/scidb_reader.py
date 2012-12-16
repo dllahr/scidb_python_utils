@@ -6,7 +6,7 @@ Created on Nov 27, 2012
 import sys
 sys.path.append('/opt/scidb/12.10/lib/') 
 import scidbapi
-import csv
+
 
 class ScidbReader:
     """provde methods to make queries to scidb and read results"""
