@@ -8,7 +8,6 @@ sys.path.append('/opt/scidb/12.10/lib/')
 import scidbapi
 import unittest
 import scidb_read.scidb_reader
-import libscidbpython as swig
 import commands
 
 class TestScidbReader(unittest.TestCase):
@@ -16,13 +15,12 @@ class TestScidbReader(unittest.TestCase):
                 
     def setUp(self):
         unittest.TestCase.setUp(self)
-        
-#        commands.getoutput("./setup.sh {}".format(self.array_name))
+        commands.getoutput("./setup.sh {}".format(self.array_name))
         
         
     def tearDown(self):
         unittest.TestCase.tearDown(self)
-#        commands.getoutput("iquery -naq \"remove({})\"".format(TestScidbReader.array_name))
+        commands.getoutput("iquery -naq \"remove({})\"".format(TestScidbReader.array_name))
         
         
     def test_read(self):
