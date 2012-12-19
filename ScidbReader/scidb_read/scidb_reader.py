@@ -6,6 +6,7 @@ Created on Nov 27, 2012
 import sys
 sys.path.append('/opt/scidb/12.10/lib/') 
 import scidbapi
+import copy
 
 
 class ScidbReader:
@@ -60,19 +61,27 @@ class ScidbReader:
             if self.__update_attr_chunk_iter():
                 raise StopIteration
 
-        result = []
+        #get dimension values at this position
+        coordinates = self.__attr_chunk_iter_tuple_list[0][1].getPosition() #get the first tuple from the list,
+                                                                            #then get the second item in the tuple
+        pos_list = list()
+        for i in range(len(coordinates)):
+            pos_list.append(coordinates[i])
+
+        #get attribute values at this position
+        attr_values = []
         for  attr_chunk_iter in self.__attr_chunk_iter_tuple_list:
             attr = attr_chunk_iter[0]
             chunk_iter = attr_chunk_iter[1]
-                
+
             if (not chunk_iter.isEmpty()):
-                result.append(scidbapi.getTypedValue(chunk_iter.getItem(), attr.getType()))
+                attr_values.append(scidbapi.getTypedValue(chunk_iter.getItem(), attr.getType()))
             else:
-                result.append(None)
+                attr_values.append(None)
                     
             chunk_iter.increment_to_next()
                 
-        return result
+        return (pos_list, attr_values)
 
 
     def __update_attr_chunk_iter(self):
