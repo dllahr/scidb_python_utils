@@ -19,9 +19,11 @@ class ScidbLoader:
     def load(self, scidb_load_col_list, csv_file, array_name):
         """load data from the indicated csv file (csv_file) into an array in SciDB
         named array_name with the attributes and dimensions specified by 
-        scidb_load_col_list (list of ScidbLoadColumn)
+        scidb_load_col_list (list of ScidbLoadColumn).  Will attempt to build
+        chunks that have a a size of {}.  
+        TODO:  need to divide the target chunk size by the number of attributes
         csv_file is assumed to have a header row
-        """
+        """.format(self.__target_chunk_size)
         
         print "generate scidb file from csv file"
         scidb_file = csv_to_scidb.convert_csv_to_scidb(csv_file)

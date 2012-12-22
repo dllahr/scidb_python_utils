@@ -19,7 +19,7 @@ import scidb_load._utils_scidb_load as _utils_scidb_load
 class TestScidbLoader(unittest.TestCase):
     def test_load(self):
         array_name = "testScidbLoaderArray"
-        #create the database connection
+
         scidb = scidbapi.connect("localhost", 1239)
         
         utils = _utils_scidb_load.UtilsScidbLoad(scidb)
@@ -41,6 +41,8 @@ class TestScidbLoader(unittest.TestCase):
         #load the data from the csv file into the database
         loader.load(scidb_load_column_list, csv_file, array_name)
 
+        #compare what was loaded to what we expected to be loaded
+        #first check format of created array
         reader = scidb_reader.ScidbReader(scidb)
         reader.read("show({})".format(array_name))
         result = reader.next()[1][0]
@@ -50,6 +52,7 @@ class TestScidbLoader(unittest.TestCase):
         self.assertTrue(result.find(",{}=".format(second_dimension)) >= 0)
         self.assertTrue(result.find("<{}:double>".format(attribute)) >= 0)
         
+        #second check values stored in array
         attribute_dimension_list = [first_dimension, second_dimension, attribute]
         #expected values from test_data.csv
         expected = {first_dimension:(1,13), second_dimension:(2,17), attribute:(3,19)}
