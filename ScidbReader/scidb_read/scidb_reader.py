@@ -24,11 +24,11 @@ class ScidbReader:
         """scidb is a scidb connection e.g. from scidbapi"""
         self.__scidb = scidb
 
-    def read(self, query):
+    def read(self, query, scidb_lang="afl"):
         """execute the provided query against scidb and provide an iterator
         over all the results
         """
-        self.__query_result = self.__scidb.executeQuery(query)
+        self.__query_result = self.__scidb.executeQuery(query, scidb_lang)
         
         desc = self.__query_result.array.getArrayDesc()
         
