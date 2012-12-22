@@ -16,12 +16,14 @@ import commands
 import scidb_read.scidb_reader as scidb_reader
 import scidb_load._utils_scidb_load as _utils_scidb_load
 
-
 class TestScidbLoader(unittest.TestCase):
     def test_load(self):
-        array_name = "testScidbLoader"
+        array_name = "testScidbLoaderArray"
         #create the database connection
         scidb = scidbapi.connect("localhost", 1239)
+        
+        utils = _utils_scidb_load.UtilsScidbLoad(scidb)
+        utils.remove_array_if_present(array_name) 
         
         first_dimension = "a"
         second_dimension = "b"
@@ -41,24 +43,23 @@ class TestScidbLoader(unittest.TestCase):
 
         reader = scidb_reader.ScidbReader(scidb)
         reader.read("show({})".format(array_name))
-        result = reader.next()[1]
+        result = reader.next()[1][0]
         reader.complete_query()
         
-        unittest.TestCase.assertTrue(result.find("[{}=".format(first_dimension)) >= 0)
-        unittest.TestCase.assertTrue(result.find(",{}=".format(second_dimension)) >= 0)
-        unittest.TestCase.assertTrue(result.find("<{}:double>".format(attribute)) >= 0)
+        self.assertTrue(result.find("[{}=".format(first_dimension)) >= 0)
+        self.assertTrue(result.find(",{}=".format(second_dimension)) >= 0)
+        self.assertTrue(result.find("<{}:double>".format(attribute)) >= 0)
         
         attribute_dimension_list = [first_dimension, second_dimension, attribute]
         #expected values from test_data.csv
         expected = {first_dimension:(1,13), second_dimension:(2,17), attribute:(3,19)}
-        
-        utils = _utils_scidb_load.UtilsScidbLoad(scidb)
+
         result = utils.get_min_and_max(attribute_dimension_list, array_name)
         
         for attr_dim in attribute_dimension_list:
             min_max_expected = expected[attr_dim]
             min_max_found = result[attr_dim]
-            unittest.TestCase.assertTupleEqual(min_max_expected, min_max_found)
+            self.assertTupleEqual(min_max_expected, min_max_found)
 
         scidb.disconnect()
 

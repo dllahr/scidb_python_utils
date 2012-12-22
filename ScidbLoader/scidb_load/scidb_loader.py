@@ -1,19 +1,19 @@
-import iquery_util
 import csv_to_scidb
+import _utils_scidb_load
 
 class ScidbLoader:
     __target_chunk_size = 1000000
+    __raw_array = "raw"
 
     __scidb = None
 
     __do_calculate_dimension_params = True
 
-    _iquery = None
-
+    _utils = None
 
     def __init__(self, scidb):
         self.__scidb = scidb
-        self._iquery = iquery_util.IqueryUtil()
+        self._utils = _utils_scidb_load.UtilsScidbLoad(self.__scidb)
 
 
     def load(self, scidb_load_col_list, csv_file, array_name):
@@ -26,17 +26,17 @@ class ScidbLoader:
         print "generate scidb file from csv file"
         scidb_file = csv_to_scidb.convert_csv_to_scidb(csv_file)
 
-        self._iquery.remove_array_if_present(self.__scidb, "raw")
+        self._utils.remove_array_if_present(self.__raw_array)
         
         raw_attr_list = [scidb_load_col.as_attribute() for scidb_load_col in scidb_load_col_list]
 
-        raw_attr_query = "create array raw <{}> [line=0:*,1000000,0]".format(", ".join(raw_attr_list))
-        #print raw_attr_query
+        raw_attr_query = "create array {} <{}> [line=0:*,1000000,0]".format(self.__raw_array, ", ".join(raw_attr_list))
+
         result = self.__scidb.executeQuery(raw_attr_query)
         self.__scidb.completeQuery(result.queryID)
 
         print "load data into raw in scidb"
-        result = self.__scidb.executeQuery("load (raw, '{}')".format(scidb_file))
+        result = self.__scidb.executeQuery("load ({}, '{}')".format(self.__raw_array, scidb_file))
         self.__scidb.completeQuery(result.queryID)
 
         if (self.__do_calculate_dimension_params):
@@ -49,26 +49,24 @@ class ScidbLoader:
                                       filter(lambda col: not col.is_attribute, scidb_load_col_list)])
         #print dimension_string
 
-        create_query = "create array {} <{}> [{}]".format(array_name, attribute_string, dimension_string)
+        create_query = "create array {} <{}> [{}]".format(array_name, 
+                                                          attribute_string, dimension_string)
         #print create_query
 
         result = self.__scidb.executeQuery(create_query)
         self.__scidb.completeQuery(result.queryID)
 
         print "redimension_store"
-        result = self.__scidb.executeQuery("redimension_store(raw, {})".format(array_name))
+        result = self.__scidb.executeQuery("redimension_store({}, {})"
+                                           .format(self.__raw_array, array_name))
         self.__scidb.completeQuery(result.queryID)
 
 
     def _calculate_dimensions(self, scidb_load_col_list):
-        min_max_attr_list = list()
-        scidb_dim_col_list = list()
-        for scidb_load_col in scidb_load_col_list:
-            if not scidb_load_col.is_attribute:
-                min_max_attr_list.append(scidb_load_col.name)
-                scidb_dim_col_list.append(scidb_load_col)
+        scidb_dim_col_list = filter(lambda col: not col.is_attribute, scidb_load_col_list)
+        min_max_dim_list = [col.name for col in scidb_dim_col_list]
         
-        min_max_dict = self._iquery.get_min_and_max(min_max_attr_list, "raw")
+        min_max_dict = self._utils.get_min_and_max(min_max_dim_list, self.__raw_array)
 
         dim_size_list = list()
 

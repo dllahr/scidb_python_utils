@@ -21,9 +21,9 @@ class TestScidbLoaderInternals(unittest.TestCase):
                                           ([333, 3003], [333, 3003]),
                                           ([101, 9901], [101, 9901])]
 
-    class __MockIqueryUtil:
+    class __MockUtilsScidbLoad:
         """
-        used to mock the method get_min_and_max within the IqueryUtil class
+        used to mock the method get_min_and_max within the UtilsScidbLoad class
         """
         __min_max_list = None
         __index = 0
@@ -73,9 +73,9 @@ class TestScidbLoaderInternals(unittest.TestCase):
                                                                "dataType{}".format(dim_size),
                                                                False))
 
-            #substitute in the Mock version of IqueryUtil that will provide 
+            #substitute in the Mock version of UtilsScidbLoad that will provide 
                 #dimension values
-            loader._iquery = self.__MockIqueryUtil(min_max_list)
+            loader._utils = self.__MockUtilsScidbLoad(min_max_list)
 
             #run the calculation to determine the dimension sizes
             loader._calculate_dimensions(col_list)
@@ -115,9 +115,9 @@ class TestScidbLoaderInternals(unittest.TestCase):
                                                                False))
                 min_val += 1
 
-            #substitute in the Mock version of IqueryUtil that will provide 
+            #substitute in the Mock version of UtilsScidbLoad that will provide 
             #dimension values
-            loader._iquery = self.__MockIqueryUtil(min_max_list)
+            loader._utils = self.__MockUtilsScidbLoad(min_max_list)
 
             #run the calculation to determine the dimension sizes
             loader._calculate_dimensions(col_list)
@@ -168,9 +168,9 @@ class TestScidbLoaderInternals(unittest.TestCase):
                 else: #insert at end of list
                     col_list.append(attribute_col)
 
-                #substitute in the Mock version of IqueryUtil that will provide 
+                #substitute in the Mock version of UtilsScidbLoad that will provide 
                     #dimension values
-                loader._iquery = self.__MockIqueryUtil(min_max_list)
+                loader._utils = self.__MockUtilsScidbLoad(min_max_list)
 
                 #run the calculation to determine the dimension sizes
                 loader._calculate_dimensions(col_list)
