@@ -20,11 +20,8 @@ DEALINGS IN THE SOFTWARE."""
 import sys
 sys.path.append('/opt/scidb/12.10/lib/') 
 import scidbapi
-sys.path.append('..')
-#import scidb_load.scidb_loader as scidb_loader
 import scidb_load.scidb_loader as scidb_loader
 import unittest
-#import scidb_load.scidb_load_column as scidb_load_column
 import scidb_load.scidb_load_column as scidb_load_column
 import commands
 import scidb_read.scidb_reader as scidb_reader
